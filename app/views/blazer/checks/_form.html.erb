@@ -63,8 +63,12 @@
 
   <% if Blazer.slack? %>
     <div class="form-group">
-      <%= f.label :slack_channels %>
-      <%= f.text_field :slack_channels, placeholder: "Optional, comma separated", class: "form-control" %>
+      <div class="checkbox">
+        <label>
+          <%= f.check_box :notify_slack %> Enable Slack notifications
+        </label>
+      </div>
+      <p class="help-block">Notifications will be sent to the default channel</p>
     </div>
   <% end %>
 

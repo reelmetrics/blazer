@@ -189,28 +189,25 @@ module Blazer
 
   def self.send_failing_checks
     emails = {}
-    slack_channels = {}
+    slack_checks = []
 
     Blazer::Check.includes(:query).where(state: ["failing", "error", "timed out", "disabled"]).find_each do |check|
       check.split_emails.each do |email|
         (emails[email] ||= []) << check
       end
-      check.split_slack_channels.each do |channel|
-        (slack_channels[channel] ||= []) << check
+      
+      # Simplified: Just check the notify_slack boolean
+      if check.notify_slack
+        slack_checks << check
       end
     end
 
+    # Send a single notification with all failing checks
     Blazer::SlackNotifier.failing_checks(slack_checks) unless slack_checks.empty?
 
     emails.each do |email, checks|
       Safely.safely do
         Blazer::CheckMailer.failing_checks(email, checks).deliver_now
-      end
-    end
-
-    slack_channels.each do |channel, checks|
-      Safely.safely do
-        Blazer::SlackNotifier.failing_checks(channel, checks)
       end
     end
   end
@@ -276,6 +273,11 @@ module Blazer
   # private
   def self.monotonic_time
     Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  end
+
+  # You might need to add a default Slack channel setting
+  def self.default_slack_channel
+    settings.dig("slack", "default_channel") || "dataquality"
   end
 end
 

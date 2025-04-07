@@ -16,8 +16,8 @@ module Blazer
     end
 
     def split_slack_channels
-      if Blazer.slack?
-        slack_channels.to_s.downcase.split(",").map(&:strip)
+      if Blazer.slack? && self[:notify_slack]
+        ["dataquality"] # Always use default channel
       else
         []
       end
@@ -91,6 +91,14 @@ module Blazer
         end
       end
       save! if changed?
+    end
+
+    def notify_slack
+      self[:notify_slack] == true
+    end
+
+    def notify_slack=(value)
+      self[:notify_slack] = value
     end
 
     private
