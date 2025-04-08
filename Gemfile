@@ -8,7 +8,7 @@ gem "combustion"
 gem "rails", "~> 8.0.0"
 gem "pg"
 gem "sqlite3"
-gem "mysql2"
+# gem "mysql2"
 gem "trilogy"
 gem "propshaft"
 
